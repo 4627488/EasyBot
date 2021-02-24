@@ -65,7 +65,12 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
             if (command.getName().equalsIgnoreCase("bot")) {
                 if (args.length == 0) {sender.sendMessage(command.getDescription());}
                 else {
-                    if (args[0].equalsIgnoreCase("reload")) {
+                    if (args[0].equalsIgnoreCase("reload") && sender.hasPermission("bot.reload")) {
+                        if (sender.hasPermission("bot.reload")) {
+                            sender.sendMessage(getMsg("permissionDeny"));
+                            return true;
+                        }
+
                         sender.sendMessage("§3BOT: §aSaving data and reconnect...");
                         bot.closeSocket();
                         vars.PlayerData.save(dataFile);
@@ -75,7 +80,6 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
 
                         initializeBot();
                         sender.sendMessage(msgMap.get("prefix").toString() + getMsg("reload"));
-
                     }
 
                     if (sender instanceof Player) {
