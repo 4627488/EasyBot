@@ -33,7 +33,6 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
             checkFile();
             Messages.initializeMsg();
             vars.prefix = msgMap.get("prefix").toString();
-            sender.sendMessage(msgMap.toString());
 
             Bukkit.getPluginManager().registerEvents(this, this);
             new PlaceHolders().register();
