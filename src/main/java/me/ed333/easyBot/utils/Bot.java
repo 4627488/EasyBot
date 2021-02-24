@@ -118,7 +118,7 @@ public class Bot extends HttpRequest implements ValuePool {
             ex.printStackTrace();
         }
     }
-    
+
     public static class Utils {
         /**
          * 发送好友消息
@@ -300,15 +300,6 @@ public class Bot extends HttpRequest implements ValuePool {
          */
         public JSONObject getSender_group_json(@NotNull JSONObject sender_json) {
             return sender_json.getJSONObject("group");
-        }
-
-        /**
-         * 通过接收到的 json 获取 "group" 块的 json
-         * @param msg_Json 接收到的 json
-         * @return group_json
-         */
-        public JSONObject getSender_group(JSONObject msg_Json) {
-            return getSender_Json(msg_Json).getJSONObject("group");
         }
 
         /**

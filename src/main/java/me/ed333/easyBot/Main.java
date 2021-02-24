@@ -5,7 +5,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
