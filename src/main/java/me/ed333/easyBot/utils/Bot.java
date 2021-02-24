@@ -80,7 +80,6 @@ public class Bot extends HttpRequest implements ValuePool {
 
         @Override
         public void onMessage(String message) {
-           sender.sendMessage(message);
 
             JSONObject msg_json = JSONObject.fromObject(message);
             vars.msg_Json = msg_json;
