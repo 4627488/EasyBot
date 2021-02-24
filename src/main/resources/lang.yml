@@ -1,0 +1,39 @@
+
+prefix: '[提示]'
+
+reload: '&a插件已重新加载！'
+InvalidArgs: '&c参数无效！请确认.'
+InvalidQQ: '&cQQ号似乎不对哦。'
+verify_msgSend: '&a已向你的QQ发送认证消息！（如果你没在群 %txt_group%, 你将无法收到认证消息！'
+notPlayer: '&c你不是玩家！只有玩家才能执行此指令。'
+
+enable_Bot: '&a启用了 Bot!'
+disable_Bot: '&c禁用了 Bot!'
+
+verify_text: '你正在进行绑定验证，请输入任意内容确认绑定。否则请无视本条消息。'
+
+group_prefix: '&7[&aQQ群&7] '
+group_to_game: '&7%txt_sender_gameName% 说: '
+
+unBound_QQ:
+  text: '&7[&c未绑定的QQ&7]'
+  hoverEvent:
+    - '发送者: %txt_sender_name%'
+    - 'QQ: %txt_sender_qq%'
+    - '这个QQ还没有绑定哦，暂时无法显示名称'
+
+Image:
+  text: '&7[&a图片&7]'
+  hoverEvent:
+    - '发送者: %txt_sender_name%'
+    - 'qq: %txt_sender_qq%'
+    - 'imageID: %txt_image_id%'
+    - 'imageUrl: %txt_image_url%'
+    - '这是一张图片，点击它来打开'
+
+At:
+  text: '&7[&b@%txt_at_targetName%&7]'
+  hoverEvent:
+    - '发送者: %txt_sender_name%(%txt_sender_qq%)'
+    - '被AT的人: %txt_at_targetName%(%txt_at_targetID%)'
+    - '  游戏名字: %txt_at_target_gameName%'

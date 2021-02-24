@@ -1,0 +1,29 @@
+# BOT 的配置
+# 确保 mirai 安装了 mirai-api-http
+
+# api-http 的地址
+host: localhost:8080
+# api-http 中的 authKey  用于验证身份
+authKey: this is only a demo key
+# bot 的QQ
+botID: 123456789
+# bot 默认启用的群号
+groupID: 987654321
+# 启用bot
+enable-bot: false
+# 消息抓取设置
+catch:
+  # 消息抓取的类型
+  # text 为只抓取纯文本类型，不抓取其他类型
+  # multi 为抓取多种类型,
+  # ## 只有当此选项为 multi 类型时
+  # img, at, emoji 等类型的抓取才有效
+  type: multi
+  # 如果为multi 则下面选项中必须有一个为true
+  # 否则将不会向游戏内推送消息
+  # 抓取纯文本消息
+  text: tru
+  # 抓取图片消息
+  img: true
+  # 抓取at消息
+  at: true
