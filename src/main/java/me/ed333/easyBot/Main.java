@@ -5,6 +5,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -65,21 +66,23 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
             if (command.getName().equalsIgnoreCase("bot")) {
                 if (args.length == 0) {sender.sendMessage(command.getDescription());}
                 else {
-                    if (args[0].equalsIgnoreCase("reload") && sender.hasPermission("bot.reload")) {
-                        if (sender.hasPermission("bot.reload")) {
+                    if (args[0].equalsIgnoreCase("reload")) {
+                        if (!sender.hasPermission("bot.reload")) {
                             sender.sendMessage(getMsg("permissionDeny"));
-                            return true;
-                        }
-
+                        } else {
                         sender.sendMessage("§3BOT: §aSaving data and reconnect...");
-                        bot.closeSocket();
                         vars.PlayerData.save(dataFile);
                         vars.Bound_data.save(Bound_Data_File);
-                        Messages.reloadMsg();
                         checkFile();
+                        reloadConfig();
+                        Messages.reloadMsg();
 
-                        initializeBot();
+                        if (defaultConfig.getBoolean("enable-bot")) {
+                            bot.closeSocket();
+                            initializeBot();
+                        }
                         sender.sendMessage(msgMap.get("prefix").toString() + getMsg("reload"));
+                        }
                     }
 
                     if (sender instanceof Player) {
@@ -176,7 +179,7 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
     @EventHandler
     private void onChat(AsyncPlayerChatEvent event) throws Exception {
         String message = event.getMessage();
-
+        if (defaultConfig.getBoolean("enable-bot"))
         utils.sendGroupMessage(
                 vars.sessionKey,
                 groupID,

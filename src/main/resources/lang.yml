@@ -6,6 +6,7 @@ InvalidArgs: '&c参数无效！请确认.'
 InvalidQQ: '&cQQ号似乎不对哦。'
 verify_msgSend: '&a已向你的QQ发送认证消息！（如果你没在群 %txt_group%, 你将无法收到认证消息！'
 notPlayer: '&c你不是玩家！只有玩家才能执行此指令。'
+permissionDeny: '&c你没有权限！'
 
 enable_Bot: '&a启用了 Bot!'
 disable_Bot: '&c禁用了 Bot!'

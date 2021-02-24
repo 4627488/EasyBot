@@ -3,3 +3,4 @@ version: ${project.version}
 main: me.ed333.easyBot.Main
 commands:
   bot:
+    description: /bot reload
