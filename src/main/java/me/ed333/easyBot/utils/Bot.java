@@ -18,6 +18,7 @@ import static me.ed333.easyBot.utils.Messages.getMsg;
 
 public class Bot extends HttpRequest implements ValuePool {
     private socketClient client;
+    public boolean isConnected;
     
     /**
      * 连接 SocketServer 监听 事件/消息
@@ -75,6 +76,8 @@ public class Bot extends HttpRequest implements ValuePool {
 
         @Override
         public void onOpen(@NotNull ServerHandshake handshake) {
+            bot.isConnected = this.isOpen();
+            sender.sendMessage(bot.isConnected + "");
             sender.sendMessage("§3BOT: §aConnected! §7| §aPlayerData: " + handshake.getHttpStatus());
         }
 
@@ -87,10 +90,10 @@ public class Bot extends HttpRequest implements ValuePool {
             if (jsonParse.getMsgType(msg_json).equals("GroupMessage")) {
                 if (jsonParse.getGroupID(msg_json).equals(groupID)) {
 
-                    String catchType = defaultConfig.getString("catch.type");
+                    String catchType = vars.Config.getString("catch.type");
 
                     for (Player p : enabled_Bot_Player) {
-                        if (catchType.equals("text") && defaultConfig.getBoolean("catch.text") && !jsonParse.getText(msg_json).equals("")) {
+                        if (catchType.equals("text") && vars.Config.getBoolean("catch.text") && !jsonParse.getText(msg_json).equals("")) {
                             p.sendMessage(jsonParse.getText(msg_json));
                         } else if (catchType.equals("multi") && (catch_at || catch_img || catch_text)) {
                             p.spigot().sendMessage(jsonParse.getMulti(msg_json));

@@ -5,7 +5,6 @@ import me.ed333.easyBot.utils.Bot;
 import net.sf.json.JSONObject;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -22,27 +21,27 @@ public interface ValuePool {
     File dataFile = new File(Main.I.dataPath, "playerData.yml");
     File Bound_Data_File = new File(Main.I.dataPath, "Bound_Data.yml");
 
-    FileConfiguration defaultConfig = Main.I.getConfig();
     ConsoleCommandSender sender = Bukkit.getConsoleSender();
 
     Bot bot = new Bot();
     Bot.Utils utils = new Bot.Utils();
     Bot.jsonParse jsonParse = new Bot.jsonParse();
 
-    long botID = defaultConfig.getLong("botID");
-    long groupID = defaultConfig.getLong("groupID");
+    long botID = vars.Config.getLong("botID");
+    long groupID = vars.Config.getLong("groupID");
 
     List<Player> enabled_Bot_Player = new ArrayList<>();
     HashMap<String, Object> msgMap = new HashMap<>();
 
-    boolean catch_text = defaultConfig.getBoolean("catch.text");
-    boolean catch_img = defaultConfig.getBoolean("catch.img");
-    boolean catch_at = defaultConfig.getBoolean("catch.at");
+    boolean catch_text = vars.Config.getBoolean("catch.text");
+    boolean catch_img = vars.Config.getBoolean("catch.img");
+    boolean catch_at = vars.Config.getBoolean("catch.at");
 
-    String url = defaultConfig.getString("host");
-    String authKey = defaultConfig.getString("authKey");
+    String url = vars.Config.getString("host");
+    String authKey = vars.Config.getString("authKey");
 
     class vars {
+        public static boolean enable_bot;
         public static String prefix;
         public static String sessionKey;
         public static JSONObject msg_Json;
@@ -55,6 +54,7 @@ public interface ValuePool {
         public static YamlConfiguration lang = YamlConfiguration.loadConfiguration(langFile);
         public static YamlConfiguration PlayerData = YamlConfiguration.loadConfiguration(dataFile);
         public static YamlConfiguration Bound_data = YamlConfiguration.loadConfiguration(Bound_Data_File);
+        public static YamlConfiguration Config = YamlConfiguration.loadConfiguration(configFile);
     }
 
     class PlaceHolders extends PlaceholderExpansion {

@@ -8,8 +8,11 @@ verify_msgSend: '&a已向你的QQ发送认证消息！（如果你没在群 %txt
 notPlayer: '&c你不是玩家！只有玩家才能执行此指令。'
 permissionDeny: '&c你没有权限！'
 
-enable_Bot: '&a启用了 Bot!'
-disable_Bot: '&c禁用了 Bot!'
+disable_Bot: '&3BOT: &e已禁用'
+enable_Bot: '&3BOT: &a已启用'
+
+player_enable_Bot: '&a你启用了 Bot!'
+player_disable_Bot: '&c你禁用了 Bot!'
 
 verify_text: '你正在进行绑定验证，请输入任意内容确认绑定。否则请无视本条消息。'
 

@@ -36,8 +36,8 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
             Bukkit.getPluginManager().registerEvents(this, this);
             new PlaceHolders().register();
 
-            if (defaultConfig.getBoolean("enable-bot")) initializeBot();
-            else sender.sendMessage("§eBot not enabled");
+            if (vars.Config.getBoolean("enable-bot")) initializeBot();
+            else sender.sendMessage(vars.prefix + getMsg("disable_Bot"));
         } catch (Exception e) {
             sender.sendMessage("§cFailed to initialize plugin: " + e.getCause());
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
     public void onDisable() {
         sender.sendMessage("§3BOT: §aSaving data and closing connect...");
         try {
-            bot.closeSocket();
+            if (vars.enable_bot) bot.closeSocket();
             vars.PlayerData.save(dataFile);
             vars.Bound_data.save(Bound_Data_File);
             sender.sendMessage("§3BOT: §aOkay! Bye bye.");
@@ -68,22 +68,27 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
                         if (!sender.hasPermission("bot.reload")) {
                             sender.sendMessage(getMsg("permissionDeny"));
                         } else {
-                        sender.sendMessage("§3BOT: §aSaving data and reconnect...");
-                        vars.PlayerData.save(dataFile);
-                        vars.Bound_data.save(Bound_Data_File);
-                        checkFile();
-                        reloadConfig();
-                        Messages.reloadMsg();
+                            sender.sendMessage("§3BOT: §aSaving data and reconnect...");
+                            vars.PlayerData.save(dataFile);
+                            vars.Bound_data.save(Bound_Data_File);
+                            checkFile();
 
-                        if (defaultConfig.getBoolean("enable-bot")) {
-                            bot.closeSocket();
-                            initializeBot();
-                        }
-                        sender.sendMessage(msgMap.get("prefix").toString() + getMsg("reload"));
-                        }
-                    }
+                            // enable_bot 配置项检查
+                            vars.enable_bot = vars.Config.getBoolean("enable-bot");
+                            if (vars.enable_bot && !bot.isConnected) {
+                                initializeBot();
+                                sender.sendMessage(getMsg("enable_Bot"));
+                            }
+                            else if (!vars.enable_bot && bot.isConnected) {
+                                bot.closeSocket();
+                                sender.sendMessage(getMsg("disable_Bot"));
+                            } else {
+                                initializeBot();
+                                sender.sendMessage(getMsg("enable_Bot"));
+                            }
 
-                    if (sender instanceof Player) {
+                        }
+                    } else if (sender instanceof Player) {
                         Player p = (Player) sender;
                         if (args[0].equalsIgnoreCase("bind") && args.length == 2) {
                             if (isQQ(args[1])) {
@@ -91,8 +96,7 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
                                         vars.sessionKey,
                                         Long.parseLong(args[1]),
                                         groupID,
-                                        false,
-                                        0,
+                                        false, 0,
                                         new JSONArray().element(
                                                 new JSONObject().element("type", "Plain")
                                                         .element("text", getMsg("verify_text"))
@@ -101,17 +105,19 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
                                 p.sendMessage(vars.prefix + getMsg("verify_msgSend"));
 
                             } else {p.sendMessage(vars.prefix + getMsg("InvalidQQ"));}
+
+                        // /bot enable
                         } else if (args[0].equalsIgnoreCase("enable")) {
                             vars.Bound_data.set(p.getUniqueId() + ".enable_Bot", true);
                             enabled_Bot_Player.add(p);
-                            p.sendMessage(vars.prefix + getMsg("enable_Bot"));
+                            p.sendMessage(vars.prefix + getMsg("player_enable_Bot"));
+
+                        // /bot disable
                         } else if (args[0].equalsIgnoreCase("disable")) {
                             vars.Bound_data.set(p.getUniqueId() + ".enable_Bot", false);
                             enabled_Bot_Player.remove(p);
-                            p.sendMessage(vars.prefix + getMsg("disable_Bot"));
+                            p.sendMessage(vars.prefix + getMsg("player_disable_Bot"));
                         }
-
-
                     } else sender.sendMessage(vars.prefix + getMsg("notPlayer"));
                 }
             }
@@ -145,6 +151,7 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
         vars.lang = YamlConfiguration.loadConfiguration(langFile);
         vars.PlayerData = YamlConfiguration.loadConfiguration(dataFile);
         vars.Bound_data = YamlConfiguration.loadConfiguration(Bound_Data_File);
+        vars.Config = YamlConfiguration.loadConfiguration(configFile);
 
         if (vars.Bound_data.getKeys(false).isEmpty()) {
             vars.Bound_data.createSection("QQ_Bound");
@@ -175,9 +182,9 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
     }
 
     @EventHandler
-    private void onChat(AsyncPlayerChatEvent event) throws Exception {
+    private void onChat(@NotNull AsyncPlayerChatEvent event) throws Exception {
         String message = event.getMessage();
-        if (defaultConfig.getBoolean("enable-bot"))
+        if (vars.enable_bot)
         utils.sendGroupMessage(
                 vars.sessionKey,
                 groupID,
