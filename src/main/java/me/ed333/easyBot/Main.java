@@ -18,8 +18,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 import static me.ed333.easyBot.utils.Messages.getMsg;
+import static me.ed333.easyBot.utils.Messages.reloadMsg;
 
-public class Main extends JavaPlugin implements ValuePool, Listener {
+public class Main extends JavaPlugin implements ValuePool {
 
     public static Main I;
     public Main() {I= this;}
@@ -32,10 +33,10 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
             checkFile();
             Messages.initializeMsg();
             vars.prefix = msgMap.get("prefix").toString();
+            vars.enable_bot = vars.Config.getBoolean("enable-bot");
 
-            Bukkit.getPluginManager().registerEvents(this, this);
-            new PlaceHolders().register();
-
+            Bukkit.getPluginManager().registerEvents(new Events(), this);
+            if(Bukkit.getPluginManager().getPlugin("PlaceHolderAPI") != null) new PlaceHolders().register();
             if (vars.Config.getBoolean("enable-bot")) initializeBot();
             else sender.sendMessage(vars.prefix + getMsg("disable_Bot"));
         } catch (Exception e) {
@@ -48,7 +49,7 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
     public void onDisable() {
         sender.sendMessage("§3BOT: §aSaving data and closing connect...");
         try {
-            if (vars.enable_bot) bot.closeSocket();
+            bot.closeSocket();
             vars.PlayerData.save(dataFile);
             vars.Bound_data.save(Bound_Data_File);
             sender.sendMessage("§3BOT: §aOkay! Bye bye.");
@@ -72,6 +73,7 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
                             vars.PlayerData.save(dataFile);
                             vars.Bound_data.save(Bound_Data_File);
                             checkFile();
+                            reloadMsg();
 
                             // enable_bot 配置项检查
                             vars.enable_bot = vars.Config.getBoolean("enable-bot");
@@ -83,6 +85,7 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
                                 bot.closeSocket();
                                 sender.sendMessage(getMsg("disable_Bot"));
                             } else {
+                                bot.closeSocket();
                                 initializeBot();
                                 sender.sendMessage(getMsg("enable_Bot"));
                             }
@@ -139,7 +142,6 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
         } else sender.sendMessage("§cBot auth failed, result: §7" + auth_result);
     }
 
-    //@SuppressWarnings("all")
     private void checkFile() throws IOException {
         if (!getDataFolder().exists()) getDataFolder().mkdirs();
         if (!configFile.exists()) saveDefaultConfig();
@@ -163,36 +165,8 @@ public class Main extends JavaPlugin implements ValuePool, Listener {
         return qq.matches("[1-9][0-9]{8,10}");
     }
 
-    @EventHandler
-    private void onJoin(@NotNull PlayerJoinEvent event) {
-        Player p = event.getPlayer();
-        if (vars.PlayerData.getBoolean(p.getUniqueId() + ".enable_Bot")) {
-            enabled_Bot_Player.add(p);
-        }else if (!utils.name_isBound(p.getName())) {
-            vars.PlayerData.set(p.getUniqueId() + ".enable_Bot", true);
-            enabled_Bot_Player.add(p);
-        }
-
-        sender.sendMessage(enabled_Bot_Player.toString());
-    }
-
-    @EventHandler
-    private void onLeave(@NotNull PlayerQuitEvent event) {
-        enabled_Bot_Player.remove(event.getPlayer());
-    }
-
-    @EventHandler
-    private void onChat(@NotNull AsyncPlayerChatEvent event) throws Exception {
-        String message = event.getMessage();
-        if (vars.enable_bot)
-        utils.sendGroupMessage(
-                vars.sessionKey,
-                groupID,
-                false,
-                0,
-                new JSONArray().element(
-                        new JSONObject().element("type", "Plain")
-                        .element("text", event.getPlayer().getName() + ": " + message)
-        ));
+    public void printDEBUG(String txt) {
+        if (vars.Config.getBoolean("DEBUG"))
+        getLogger().info("DEBUG: " + txt);
     }
 }

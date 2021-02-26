@@ -1,6 +1,7 @@
 name: EasyBot
-version: ${project.version}
+version: ${version}
 main: me.ed333.easyBot.Main
+softdepend: [PlaceHolderAPI]
 commands:
   bot:
     description: /bot reload

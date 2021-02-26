@@ -12,6 +12,12 @@ groupID: 987654321
 # 启用bot
 enable-bot: false
 # 消息抓取设置
+
+# 调试模式
+# 非必要无需打开
+# 否则只会增多无用的日志输出！
+DEBUG: false
+
 catch:
   # 消息抓取的类型
   # text 为只抓取纯文本类型，不抓取其他类型
@@ -20,9 +26,9 @@ catch:
   # img, at, emoji 等类型的抓取才有效
   type: multi
   # 如果为multi 则下面选项中必须有一个为true
-  # 否则将不会向游戏内推送消息
+  # 否则将不会向游戏内推送消息e
   # 抓取纯文本消息
-  text: tru
+  text: true
   # 抓取图片消息
   img: true
   # 抓取at消息

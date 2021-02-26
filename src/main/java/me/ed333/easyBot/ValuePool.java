@@ -2,6 +2,7 @@ package me.ed333.easyBot;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.ed333.easyBot.utils.Bot;
+import me.ed333.easyBot.utils.JSON;
 import net.sf.json.JSONObject;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -25,7 +26,7 @@ public interface ValuePool {
 
     Bot bot = new Bot();
     Bot.Utils utils = new Bot.Utils();
-    Bot.jsonParse jsonParse = new Bot.jsonParse();
+    JSON.jsonParse jsonParse = new JSON.jsonParse();
 
     long botID = vars.Config.getLong("botID");
     long groupID = vars.Config.getLong("groupID");
