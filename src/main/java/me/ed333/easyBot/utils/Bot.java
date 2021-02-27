@@ -1,5 +1,6 @@
 package me.ed333.easyBot.utils;
 
+import me.ed333.easyBot.CodeErrExpection;
 import me.ed333.easyBot.Main;
 import me.ed333.easyBot.ValuePool;
 import net.md_5.bungee.api.chat.*;
@@ -16,8 +17,10 @@ import java.util.HashMap;
 import java.util.Set;
 
 import static me.ed333.easyBot.utils.Messages.getMsg;
+import static me.ed333.easyBot.utils.Messages.get_unBoundTXT;
+import static me.ed333.easyBot.utils.HttpRequest.*;
 
-public class Bot extends HttpRequest implements ValuePool {
+public class Bot implements ValuePool {
     private socketClient client;
     public boolean isConnected;
     
@@ -26,9 +29,9 @@ public class Bot extends HttpRequest implements ValuePool {
      * @param sessionKey session
      */
     public void connect(String sessionKey) throws URISyntaxException {
-        sender.sendMessage("§3BOT: §eConnecting to http socket server...");
+        sender.sendMessage("§3BOT: §a链接服务器中...");
 
-        URI uri = new URI("ws://" + this.url + "/message?sessionKey=" + sessionKey);
+        URI uri = new URI("ws://" + this.url + "/" + vars.Config.getString("receive_type") + "?sessionKey=" + sessionKey);
         client = new socketClient(uri);
         client.connect();
     }
@@ -38,9 +41,10 @@ public class Bot extends HttpRequest implements ValuePool {
      */
     public void closeSocket() throws Exception {
         client.close();
-        sender.sendMessage("§3BOT: §aReleasing session...");
-        String result = bot.release_Session(vars.sessionKey);
-        sender.sendMessage("§3BOT: §aRelease session finished. result: " + result);
+        sender.sendMessage("§3BOT: §a释放session...");
+        JSONObject result = JSONObject.fromObject(bot.release_Session(vars.sessionKey));
+        if (result.getInt("code") == 0) sender.sendMessage("§3BOT: §a释放完成. result: " + result);
+        else throw new CodeErrExpection("§3BOT: §c释放失败！服务器返回结果: " + result);
     }
 
     /**
@@ -48,7 +52,7 @@ public class Bot extends HttpRequest implements ValuePool {
      * @return result
      */
     public String auth() throws Exception {
-        sender.sendMessage("§aAuth bot...");
+        sender.sendMessage("§3BOT: §a注册bot...");
         return doPost("http://" + this.url + "/auth", new JSONObject().element("authKey", authKey));
     }
 
@@ -58,20 +62,20 @@ public class Bot extends HttpRequest implements ValuePool {
      * @return result String
      */
     public String verify(String SessionKey) throws Exception {
-        sender.sendMessage("§aStarting bind...");
+        sender.sendMessage("§3BOT: §a绑定BOT...");
         return doPost("http://" + this.url + "/verify", new JSONObject().element("sessionKey", SessionKey).element("qq", botID));
     }
 
     /**
      * 在卸载插件时释放 bot 绑定的session
      */
-    public String release_Session(String sessionKey) throws Exception {
+    protected String release_Session(String sessionKey) throws Exception {
         JSONObject request = new JSONObject().element("sessionKey", sessionKey)
                 .element("qq", botID);
         return doPost("http://" + url + "/release", request);
     }
 
-    static class socketClient extends WebSocketClient implements ValuePool {
+    protected static class socketClient extends WebSocketClient implements ValuePool {
 
         public socketClient(URI serverUri) { super(serverUri); }
 
@@ -79,7 +83,7 @@ public class Bot extends HttpRequest implements ValuePool {
         public void onOpen(@NotNull ServerHandshake handshake) {
             bot.isConnected = this.isOpen();
             sender.sendMessage(bot.isConnected + "");
-            sender.sendMessage("§3BOT: §aConnected! §7| §aPlayerData: " + handshake.getHttpStatus());
+            sender.sendMessage("§3BOT: §a连接成功！ 状态: " + handshake.getHttpStatusMessage() + " | " + handshake.getHttpStatus());
         }
 
         @Override
@@ -103,9 +107,9 @@ public class Bot extends HttpRequest implements ValuePool {
                 }
             } else if (jsonParse.getMsgType(msg_json).equals("TempMessage")) {
                 if (vars.verify.containsValue(jsonParse.getSenderId(msg_json))) {
-                    vars.Bound_data.set("QQ_Bound." + jsonParse.getSenderId(msg_json), utils.getKey(vars.verify, jsonParse.getSenderId(msg_json)));
-                    vars.Bound_data.set("Name_Bound." + utils.getKey(vars.verify, jsonParse.getSenderId(msg_json)), jsonParse.getSenderId(msg_json));
-                    vars.verify.remove(utils.getKey(vars.verify, jsonParse.getSenderId(msg_json)));
+                    vars.Bound_data.set("QQ_Bound." + jsonParse.getSenderId(msg_json), getKey(vars.verify, jsonParse.getSenderId(msg_json)));
+                    vars.Bound_data.set("Name_Bound." + getKey(vars.verify, jsonParse.getSenderId(msg_json)), jsonParse.getSenderId(msg_json));
+                    vars.verify.remove(getKey(vars.verify, jsonParse.getSenderId(msg_json)));
                 }
             }
 
@@ -113,12 +117,12 @@ public class Bot extends HttpRequest implements ValuePool {
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
-            sender.sendMessage("§3BOT: §aOkay,closed!");
+            sender.sendMessage("§3BOT: §a从服务器断开连接!");
         }
 
         @Override
         public void onError(@NotNull Exception ex) {
-            sender.sendMessage("§3BOT: §cOh, it looks that something takes wrong, result: " + ex.getCause());
+            sender.sendMessage("§3BOT: §c出错了！原因: " + ex.getCause());
             ex.printStackTrace();
         }
     }
@@ -172,17 +176,17 @@ public class Bot extends HttpRequest implements ValuePool {
             return doGet("http://" + url + "/memberInfo", "sessionKey=" + vars.sessionKey + "&target=" + groupID + "&memberId=" + memberID);
         }
 
-//
-//        /**
-//         * 撤回消息
-//         * @param SourceID 消息的ID
-//         * @return result
-//         */
-//        public String recall(String sessionKey, int SourceID) throws Exception {
-//            JSONObject request = new JSONObject().element("sessionKey", sessionKey)
-//                    .element("target", SourceID);
-//            return doPost("http://" + b.url + "/recall", request);
-//        }
+
+        /**
+         * 撤回消息
+         * @param SourceID 消息的ID
+         * @return result
+         */
+        public String recall(String sessionKey, int SourceID) throws Exception {
+            JSONObject request = new JSONObject().element("sessionKey", sessionKey)
+                    .element("target", SourceID);
+            return doPost("http://" + url + "/recall", request);
+        }
 //
 //        /**
 //         * 禁言群员
@@ -245,26 +249,14 @@ public class Bot extends HttpRequest implements ValuePool {
             sender.sendMessage(bound_name.toString());
             return bound_name.contains(name);
         }
+    }
 
-        protected TextComponent get_unBoundTXT() {
-            TextComponent tc = new TextComponent(getMsg("unBound_QQ.text"));
-            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
-                   hoverEvent_txt_replace(getMsg("unBound_QQ.hoverEvent"))
-            ).create()));
-            return tc;
+    protected static String getKey(HashMap<String, Long> map, Object value) {
+        String key = "NOT FIND";
+        Set<String> keySet = map.keySet();
+        for (String o : keySet) {
+            if (map.get(o).equals(value)) key = o;
         }
-
-        protected String hoverEvent_txt_replace(String txt) {
-            return txt.replace("[", "").replace("]", "").replace(", ", "\n");
-        }
-
-        private String getKey(HashMap<String, Long> map, Object value) {
-            String key = "NOT FIND";
-            Set<String> keySet = map.keySet();
-            for (String o : keySet) {
-                if (map.get(o).equals(value)) key = o;
-            }
-            return key;
-        }
+        return key;
     }
 }

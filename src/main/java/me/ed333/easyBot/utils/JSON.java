@@ -10,6 +10,7 @@ import net.sf.json.JSONObject;
 import org.jetbrains.annotations.NotNull;
 
 import static me.ed333.easyBot.utils.Messages.getMsg;
+import static me.ed333.easyBot.utils.Messages.hoverEvent_txt_replace;
 
 public class JSON implements ValuePool{
     public static class jsonParse {
@@ -150,7 +151,7 @@ public class JSON implements ValuePool{
                     image_txt.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, getImg_url(msg_Single)));
                     image_txt.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                             new ComponentBuilder(
-                                    utils.hoverEvent_txt_replace(getMsg("Image.hoverEvent"))
+                                    hoverEvent_txt_replace(getMsg("Image.hoverEvent"))
                             ).create()));
                     txt.addExtra(image_txt);
                 }
@@ -160,7 +161,7 @@ public class JSON implements ValuePool{
                     TextComponent at_txt = new TextComponent(getMsg("At.text"));
                     at_txt.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                             new ComponentBuilder(
-                                    utils.hoverEvent_txt_replace(getMsg("At.hoverEvent"))
+                                    hoverEvent_txt_replace(getMsg("At.hoverEvent"))
                             ).create()));
                     txt.addExtra(at_txt);
                 }
@@ -169,5 +170,14 @@ public class JSON implements ValuePool{
         }
     }
 
+    public static class jsonBuild {
 
+        // 建立一个纯文本的 MessageChain
+        public static JSONArray toRaw_MsgChain(String rawMsg) {
+            return new JSONArray().element(
+                    new JSONObject().element("type", "Plain")
+                    .element("text", rawMsg)
+            );
+        }
+    }
 }

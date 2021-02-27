@@ -13,6 +13,12 @@ groupID: 987654321
 enable-bot: false
 # 消息抓取设置
 
+# 接收类型
+# event 为只接收 bot 的事件
+# message 为只接收 bot 收到的消息
+# all 为两者都接收
+receive_type: message
+
 # 调试模式
 # 非必要无需打开
 # 否则只会增多无用的日志输出！

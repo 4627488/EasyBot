@@ -5,6 +5,7 @@ import me.ed333.easyBot.utils.Bot;
 import me.ed333.easyBot.utils.JSON;
 import net.sf.json.JSONObject;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -32,6 +33,11 @@ public interface ValuePool {
     long groupID = vars.Config.getLong("groupID");
 
     List<Player> enabled_Bot_Player = new ArrayList<>();
+
+    /**
+     * k: msg Key
+     * v: msg val
+     */
     HashMap<String, Object> msgMap = new HashMap<>();
 
     boolean catch_text = vars.Config.getBoolean("catch.text");
@@ -48,9 +54,10 @@ public interface ValuePool {
         public static JSONObject msg_Json;
         public static JSONObject msg_Img;
         public static JSONObject msg_At;
-        //public static HashMap<String, Long>
-
-        // game Name    QQid
+        /**
+         * k: game name
+         * v: qq
+         */
         public static HashMap<String, Long> verify = new HashMap<>();
         public static YamlConfiguration lang = YamlConfiguration.loadConfiguration(langFile);
         public static YamlConfiguration PlayerData = YamlConfiguration.loadConfiguration(dataFile);

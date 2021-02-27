@@ -14,13 +14,16 @@ public class Events implements ValuePool, Listener {
     @EventHandler
     private void onJoin(@NotNull PlayerJoinEvent event) {
         Player p = event.getPlayer();
-        if (ValuePool.vars.PlayerData.getBoolean(p.getUniqueId() + ".enable_Bot")) {
-            enabled_Bot_Player.add(p);
-        }else if (!utils.name_isBound(p.getName())) {
-            ValuePool.vars.PlayerData.set(p.getUniqueId() + ".enable_Bot", true);
-            enabled_Bot_Player.add(p);
+        if (!enabled_Bot_Player.contains(p)) {
+            if (vars.PlayerData.getBoolean(p.getUniqueId() + ".enable_Bot")) {
+                enabled_Bot_Player.add(p);
+            }else if (!utils.name_isBound(p.getName())) {
+                vars.PlayerData.set(p.getUniqueId() + ".enable_Bot", true);
+                enabled_Bot_Player.add(p);
+            }
         }
 
+        vars.PlayerData.set(p.getUniqueId() + ".lastName", p.getName());
         sender.sendMessage(enabled_Bot_Player.toString());
     }
 

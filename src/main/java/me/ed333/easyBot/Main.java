@@ -7,15 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import static me.ed333.easyBot.utils.Messages.getMsg;
 import static me.ed333.easyBot.utils.Messages.reloadMsg;
@@ -36,25 +32,33 @@ public class Main extends JavaPlugin implements ValuePool {
             vars.enable_bot = vars.Config.getBoolean("enable-bot");
 
             Bukkit.getPluginManager().registerEvents(new Events(), this);
-            if(Bukkit.getPluginManager().getPlugin("PlaceHolderAPI") != null) new PlaceHolders().register();
+            if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) new PlaceHolders().register();
             if (vars.Config.getBoolean("enable-bot")) initializeBot();
             else sender.sendMessage(vars.prefix + getMsg("disable_Bot"));
+
+            Collection<? extends Player> onlinePlayers = getServer().getOnlinePlayers();
+
+            for (Player p : onlinePlayers) {
+                if (vars.PlayerData.getBoolean(p.getUniqueId() + ".enable_Bot")) {
+                    enabled_Bot_Player.add(p);
+                }
+            }
         } catch (Exception e) {
-            sender.sendMessage("§cFailed to initialize plugin: " + e.getCause());
+            sender.sendMessage("[EasyBot] §c初始化插件失败: " + e.getCause());
             e.printStackTrace();
         }
     }
 
     @Override
     public void onDisable() {
-        sender.sendMessage("§3BOT: §aSaving data and closing connect...");
+        sender.sendMessage("§3BOT: §a关闭并保存数据中...");
         try {
             bot.closeSocket();
             vars.PlayerData.save(dataFile);
             vars.Bound_data.save(Bound_Data_File);
-            sender.sendMessage("§3BOT: §aOkay! Bye bye.");
+            sender.sendMessage("§3BOT: §a数据保存完毕！再见，感谢使用 EasyBot.");
         } catch (Exception e) {
-            sender.sendMessage("§3BOT: §cOh! Something takes wrong: " + e.getCause());
+            sender.sendMessage("§3BOT: §c出错了！原因: " + e.getCause());
             e.printStackTrace();
         }
     }
@@ -69,7 +73,7 @@ public class Main extends JavaPlugin implements ValuePool {
                         if (!sender.hasPermission("bot.reload")) {
                             sender.sendMessage(getMsg("permissionDeny"));
                         } else {
-                            sender.sendMessage("§3BOT: §aSaving data and reconnect...");
+                            sender.sendMessage("§3BOT: §a保存配置并重新连接...");
                             vars.PlayerData.save(dataFile);
                             vars.Bound_data.save(Bound_Data_File);
                             checkFile();
@@ -84,12 +88,11 @@ public class Main extends JavaPlugin implements ValuePool {
                             else if (!vars.enable_bot && bot.isConnected) {
                                 bot.closeSocket();
                                 sender.sendMessage(getMsg("disable_Bot"));
-                            } else {
+                            } else if (bot.isConnected){
                                 bot.closeSocket();
                                 initializeBot();
                                 sender.sendMessage(getMsg("enable_Bot"));
                             }
-
                         }
                     } else if (sender instanceof Player) {
                         Player p = (Player) sender;
@@ -132,14 +135,14 @@ public class Main extends JavaPlugin implements ValuePool {
     public void initializeBot() throws Exception {
         JSONObject auth_result = JSONObject.fromObject(bot.auth());
         if (auth_result.getInt("code") == 0) {
-            sender.sendMessage("§aAuth successful! result: " + auth_result);
+            sender.sendMessage("§3BOT: §a注册成功! result: " + auth_result);
             vars.sessionKey = auth_result.getString("session");
             JSONObject verify_result = JSONObject.fromObject(bot.verify(vars.sessionKey));
             if (verify_result.getInt("code") == 0) {
-                sender.sendMessage("§aSuccessful! result: " + verify_result);
+                sender.sendMessage("§3BOT: §a验证成功! 服务器返回结果: " + verify_result);
                 bot.connect(vars.sessionKey);
-            } else sender.sendMessage("§cBot bind failed! result: §7" + verify_result);
-        } else sender.sendMessage("§cBot auth failed, result: §7" + auth_result);
+            } else sender.sendMessage("§3BOT: §c验证失败！ 服务器返回结果: §7" + verify_result);
+        } else sender.sendMessage("§3BOT: §c注册失败！服务器返回结果: §7" + auth_result);
     }
 
     private void checkFile() throws IOException {
