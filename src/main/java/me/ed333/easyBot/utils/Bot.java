@@ -3,6 +3,7 @@ package me.ed333.easyBot.utils;
 import me.ed333.easyBot.CodeErrExpection;
 import me.ed333.easyBot.Main;
 import me.ed333.easyBot.ValuePool;
+import me.ed333.easyBot.events.bot.BotEventHandle;
 import net.md_5.bungee.api.chat.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -91,6 +92,7 @@ public class Bot implements ValuePool {
             Main.I.printDEBUG(message);
             JSONObject msg_json = JSONObject.fromObject(message);
             vars.msg_Json = msg_json;
+            new BotEventHandle(msg_json);
 
             if (jsonParse.getMsgType(msg_json).equals("GroupMessage")) {
                 if (jsonParse.getGroupID(msg_json).equals(groupID)) {

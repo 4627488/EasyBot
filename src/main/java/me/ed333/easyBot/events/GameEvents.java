@@ -1,5 +1,7 @@
-package me.ed333.easyBot;
+package me.ed333.easyBot.events;
 
+import me.ed333.easyBot.ValuePool;
+import me.ed333.easyBot.events.bot.BotEvent.BotMuteEvent;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.bukkit.entity.Player;
@@ -10,7 +12,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class Events implements ValuePool, Listener {
+/**
+ * 游戏事件
+ */
+public class GameEvents implements ValuePool, Listener {
     @EventHandler
     private void onJoin(@NotNull PlayerJoinEvent event) {
         Player p = event.getPlayer();
