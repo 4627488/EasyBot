@@ -7,8 +7,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * <p>群消息事件</p>
- * <p>被继承的类, 不会被触发</p>
+ * <p>基础消息事件，被继承的类, 不会被触发</p>
+ * <p>包含了部分基础方法</p>
  */
 class MessageEvent extends Event implements ValuePool {
     private final JSONObject json;
