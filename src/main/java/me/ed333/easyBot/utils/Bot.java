@@ -1,13 +1,14 @@
 package me.ed333.easyBot.utils;
 
-import me.ed333.easyBot.CodeErrExpection;
+import me.ed333.easyBot.CodeErrException;
 import me.ed333.easyBot.Main;
 import me.ed333.easyBot.ValuePool;
 import me.ed333.easyBot.events.bot.BotEventHandle;
+import me.ed333.easyBot.events.bot.GroupEventHandle;
+import me.ed333.easyBot.events.bot.MessageEventHandle;
 import net.md_5.bungee.api.chat.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.bukkit.entity.Player;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ public class Bot implements ValuePool {
     /**
      * 连接 SocketServer 监听 事件/消息
      * @param sessionKey session
+     * @throws URISyntaxException 链接不存在或链接错误
      */
     public void connect(String sessionKey) throws URISyntaxException {
         sender.sendMessage("§3BOT: §a链接服务器中...");
@@ -39,18 +41,20 @@ public class Bot implements ValuePool {
 
     /**
      * 关闭连接
+     * @throws Exception 请求异常
      */
     public void closeSocket() throws Exception {
         client.close();
         sender.sendMessage("§3BOT: §a释放session...");
         JSONObject result = JSONObject.fromObject(bot.release_Session(vars.sessionKey));
         if (result.getInt("code") == 0) sender.sendMessage("§3BOT: §a释放完成. result: " + result);
-        else throw new CodeErrExpection("§3BOT: §c释放失败！服务器返回结果: " + result);
+        else throw new CodeErrException("§3BOT: §c释放失败！服务器返回结果: " + result);
     }
 
     /**
      * 验证身份
      * @return result
+     * @throws Exception 请求异常
      */
     public String auth() throws Exception {
         sender.sendMessage("§3BOT: §a注册bot...");
@@ -61,6 +65,7 @@ public class Bot implements ValuePool {
      * 校验 Session 并将 Session 绑定到BotQQ
      * @param SessionKey session
      * @return result String
+     * @throws Exception 请求异常
      */
     public String verify(String SessionKey) throws Exception {
         sender.sendMessage("§3BOT: §a绑定BOT...");
@@ -69,6 +74,9 @@ public class Bot implements ValuePool {
 
     /**
      * 在卸载插件时释放 bot 绑定的session
+     * @param sessionKey sessionKey
+     * @return result
+     * @throws Exception 请求异常
      */
     protected String release_Session(String sessionKey) throws Exception {
         JSONObject request = new JSONObject().element("sessionKey", sessionKey)
@@ -92,28 +100,30 @@ public class Bot implements ValuePool {
             Main.I.printDEBUG(message);
             JSONObject msg_json = JSONObject.fromObject(message);
             vars.msg_Json = msg_json;
+
             new BotEventHandle(msg_json);
-
-            if (jsonParse.getMsgType(msg_json).equals("GroupMessage")) {
-                if (jsonParse.getGroupID(msg_json).equals(groupID)) {
-
-                    String catchType = vars.Config.getString("catch.type");
-
-                    for (Player p : enabled_Bot_Player) {
-                        if (catchType.equals("text") && vars.Config.getBoolean("catch.text") && !jsonParse.getText(msg_json).equals("")) {
-                            p.sendMessage(jsonParse.getText(msg_json));
-                        } else if (catchType.equals("multi") && (catch_at || catch_img || catch_text)) {
-                            p.spigot().sendMessage(jsonParse.getMulti(msg_json));
-                        }
-                    }
-                }
-            } else if (jsonParse.getMsgType(msg_json).equals("TempMessage")) {
-                if (vars.verify.containsValue(jsonParse.getSenderId(msg_json))) {
-                    vars.Bound_data.set("QQ_Bound." + jsonParse.getSenderId(msg_json), getKey(vars.verify, jsonParse.getSenderId(msg_json)));
-                    vars.Bound_data.set("Name_Bound." + getKey(vars.verify, jsonParse.getSenderId(msg_json)), jsonParse.getSenderId(msg_json));
-                    vars.verify.remove(getKey(vars.verify, jsonParse.getSenderId(msg_json)));
-                }
-            }
+            new GroupEventHandle(msg_json);
+            new MessageEventHandle(msg_json);
+//            if (jsonParse.getMsgType(msg_json).equals("GroupMessage")) {
+//                if (jsonParse.getGroupID(msg_json).equals(groupID)) {
+//
+//                    String catchType = vars.Config.getString("catch.type");
+//
+//                    for (Player p : enabled_Bot_Player) {
+//                        if (catchType.equals("text") && vars.Config.getBoolean("catch.text") && !jsonParse.getText(msg_json).equals("")) {
+//                            p.sendMessage(jsonParse.getText(msg_json));
+//                        } else if (catchType.equals("multi") && (catch_at || catch_img || catch_text)) {
+//                            p.spigot().sendMessage(jsonParse.getMulti(msg_json));
+//                        }
+//                    }
+//                }
+//            } else if (jsonParse.getMsgType(msg_json).equals("TempMessage")) {
+//                if (vars.verify.containsValue(jsonParse.getSenderId(msg_json))) {
+//                    vars.Bound_data.set("QQ_Bound." + jsonParse.getSenderId(msg_json), getKey(vars.verify, jsonParse.getSenderId(msg_json)));
+//                    vars.Bound_data.set("Name_Bound." + getKey(vars.verify, jsonParse.getSenderId(msg_json)), jsonParse.getSenderId(msg_json));
+//                    vars.verify.remove(getKey(vars.verify, jsonParse.getSenderId(msg_json)));
+//                }
+//            }
 
         }
 
@@ -138,6 +148,7 @@ public class Bot implements ValuePool {
          * @param code 如果引用启用， msg 的 SourceID
          * @param msgChain 要发送的消息
          * @return result
+         * @throws Exception 请求异常
          */
         public String sendFriendMessage(String sessionKey, long target, boolean quote, int code, JSONArray msgChain) throws Exception {
             JSONObject request = new JSONObject().element("sessionKey", sessionKey)
@@ -149,9 +160,14 @@ public class Bot implements ValuePool {
 
         /**
          * 通过群给某人发送临时消息
+         * @param sessionKey sessionKey
          * @param qq 临时消息对象的QQ
          * @param groupID 临时消息的群号
+         * @param quote 启用引用
+         * @param code 如果启用引用, 引用的Message id
+         * @param msgChain 消息链
          * @return result
+         * @throws Exception 请求异常
          */
         public String sendTempMessage(String sessionKey, long qq, long groupID, boolean quote, int code, JSONArray msgChain) throws Exception {
             JSONObject request = new JSONObject().element("sessionKey", sessionKey)
@@ -164,7 +180,13 @@ public class Bot implements ValuePool {
 
         /**
          * 发送群聊消息
+         * @param sessionKey sessionKey
+         * @param groupID 群号
+         * @param quote 启用引用
+         * @param code 如果启用引用, 引用的 Message id
+         * @param msgChain 消息链
          * @return result
+         * @throws Exception 请求异常
          */
         public String sendGroupMessage(String sessionKey, long groupID, boolean quote, int code, JSONArray msgChain) throws Exception {
             JSONObject request = new JSONObject().element("sessionKey", sessionKey)
@@ -174,6 +196,11 @@ public class Bot implements ValuePool {
             return doPost("http://" + url + "/sendGroupMessage", request);
         }
 
+        /**
+         * 获取群员的信息
+         * @param memberID 群员的QQ
+         * @return result
+         */
         public @NotNull String getMemberInfo(long memberID) {
             return doGet("http://" + url + "/memberInfo", "sessionKey=" + vars.sessionKey + "&target=" + groupID + "&memberId=" + memberID);
         }
@@ -181,8 +208,10 @@ public class Bot implements ValuePool {
 
         /**
          * 撤回消息
+         * @param sessionKey sessionKey
          * @param SourceID 消息的ID
          * @return result
+         * @throws Exception 请求异常
          */
         public String recall(String sessionKey, int SourceID) throws Exception {
             JSONObject request = new JSONObject().element("sessionKey", sessionKey)
@@ -237,8 +266,18 @@ public class Bot implements ValuePool {
                     );
         }
 
+        /*
+        这两个方法没有什么区别
+        只不过是通过未绑定的QQ获取时
+        一个返回了 lang.yml 中的 unBound_QQ.text 内容
+        一个返回了 null
+         */
         public String get_gameName_byQQ(long qq) {
             return qq_isBound(qq) ? getMsg("unBound_QQ.text") : vars.Bound_data.getString("QQ_Bound." + qq);
+        }
+
+        public String get_gameName(long qq) {
+            return qq_isBound(qq) ? null : vars.Bound_data.getString("QQ_Bound." + qq);
         }
 
         public boolean qq_isBound(long qq) {

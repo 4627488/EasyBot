@@ -4,6 +4,7 @@
 .gradle/
 build/
 CONSOLE/
+CONSOLE1/
 
 *.iml
 *.ipr

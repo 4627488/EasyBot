@@ -12,7 +12,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.Set;
 
 import static me.ed333.easyBot.utils.Messages.getMsg;
 import static me.ed333.easyBot.utils.Messages.reloadMsg;
@@ -28,6 +31,7 @@ public class Main extends JavaPlugin implements ValuePool {
     public void onEnable() {
         try {
             checkFile();
+            CheckCfg();
             Messages.initializeMsg();
             vars.prefix = msgMap.get("prefix").toString();
             vars.enable_bot = vars.Config.getBoolean("enable-bot");
@@ -133,7 +137,7 @@ public class Main extends JavaPlugin implements ValuePool {
         return false;
     }
 
-    public void initializeBot() throws Exception {
+    private void initializeBot() throws Exception {
         JSONObject auth_result = JSONObject.fromObject(bot.auth());
         if (auth_result.getInt("code") == 0) {
             sender.sendMessage("§3BOT: §a注册成功! result: " + auth_result);
@@ -172,5 +176,23 @@ public class Main extends JavaPlugin implements ValuePool {
     public void printDEBUG(String txt) {
         if (vars.Config.getBoolean("DEBUG"))
         getLogger().info("DEBUG: " + txt);
+    }
+
+    /*
+    检查有无新增配置
+     */
+    private void CheckCfg() throws IOException {
+        InputStream in = getResource("config.yml");
+        YamlConfiguration resourceConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(in));
+        Set<String> resourceConfigKeys = resourceConfig.getKeys(true);
+        for (String key : resourceConfigKeys) {
+            Object configVal = vars.Config.get(key);
+            if (configVal == null) {
+                vars.Config.set(key, resourceConfig.get(key));
+                vars.Config.save(configFile);
+            }
+        }
+
+        vars.Config = YamlConfiguration.loadConfiguration(configFile);
     }
 }

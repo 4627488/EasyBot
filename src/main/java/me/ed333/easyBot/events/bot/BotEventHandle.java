@@ -1,18 +1,19 @@
 package me.ed333.easyBot.events.bot;
 
 import me.ed333.easyBot.events.bot.BotEvent.*;
-import me.ed333.easyBot.events.bot.GroupEvent.MemberMuteEvent;
 import net.sf.json.JSONObject;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 
+/**
+ * <p>检查是否接收到了事件</p>
+ * <p>如果接收到了事件就触发对应事件</p>
+ */
 public class BotEventHandle {
     public BotEventHandle(JSONObject event_json) {
         String EventType = event_json.getString("type");
         PluginManager manager = Bukkit.getServer().getPluginManager();
         switch (EventType) {
-            case "MemberMuteEvent":
-               manager.callEvent(new MemberMuteEvent(event_json));
             case"BotOnlineEvent":
                 manager.callEvent(new BotOnlineEvent(event_json));
             case "BotOfflineEventActive":

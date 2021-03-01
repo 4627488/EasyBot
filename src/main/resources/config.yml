@@ -19,6 +19,11 @@ enable-bot: false
 # all 为两者都接收
 receive_type: message
 
+# 检查更新
+updateCheck: true
+# 自动下载更新
+autoDownload: false
+
 # 调试模式
 # 非必要无需打开
 # 否则只会增多无用的日志输出！

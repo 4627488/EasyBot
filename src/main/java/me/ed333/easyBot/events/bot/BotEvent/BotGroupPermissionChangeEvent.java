@@ -1,12 +1,12 @@
 package me.ed333.easyBot.events.bot.BotEvent;
 
-import me.ed333.easyBot.events.bot.GroupEvent.MuteEvent;
+import me.ed333.easyBot.events.bot.TriggeredByOperator;
 import net.sf.json.JSONObject;
 
 /**
  * Bot 权限在群中改变事件
  */
-public class BotGroupPermissionChangeEvent extends MuteEvent {
+public class BotGroupPermissionChangeEvent extends TriggeredByOperator {
     private final JSONObject json;
 
     public BotGroupPermissionChangeEvent(JSONObject json) {
@@ -19,6 +19,7 @@ public class BotGroupPermissionChangeEvent extends MuteEvent {
      * <p>OWNER</p>
      * <p>ADMINISTRATOR</p>
      * <p>MEMBER</p>
+     * @return Bot origin permission
      */
     public String get_OriginPerm() {
         return json.getString("origin");
@@ -29,6 +30,7 @@ public class BotGroupPermissionChangeEvent extends MuteEvent {
      * <p>OWNER</p>
      * <p>ADMINISTRATOR</p>
      * <p>MEMBER</p>
+     * @return Bot new permission
      */
     public String get_Current() {
         return json.getString("current");
