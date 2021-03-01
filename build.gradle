@@ -30,6 +30,7 @@ dependencies {
 
 group = 'EasyBot'
 version = '1.3-BETA'
+double ver = 1.3
 description = 'EasyBot'
 
 
@@ -43,9 +44,10 @@ shadowJar {
 
 processResources {
     from(sourceSets.main.resources.srcDirs) {
-        include 'plugin.yml'
+        include 'plugin.yml','config.yml'
         expand(
                 version: project.version,
+                ver: ver,
         )
     }
 }

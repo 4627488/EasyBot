@@ -1,6 +1,7 @@
 package me.ed333.easyBot;
 
 import me.ed333.easyBot.events.GameEvents;
+import me.ed333.easyBot.utils.HttpRequest;
 import me.ed333.easyBot.utils.Messages;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -32,6 +33,8 @@ public class Main extends JavaPlugin implements ValuePool {
         try {
             checkFile();
             CheckCfg();
+            CheckUpdate();
+
             Messages.initializeMsg();
             vars.prefix = msgMap.get("prefix").toString();
             vars.enable_bot = vars.Config.getBoolean("enable-bot");
@@ -193,6 +196,19 @@ public class Main extends JavaPlugin implements ValuePool {
             }
         }
 
+        if (vars.Config.getDouble("version") != resourceConfig.getDouble("version")) {
+            vars.Config.set("version", resourceConfig.getDouble("version"));
+        }
         vars.Config = YamlConfiguration.loadConfiguration(configFile);
+    }
+
+    private void CheckUpdate() {
+        JSONObject updateJson = JSONObject.fromObject(HttpRequest.doGet("https://api.github.com/repos/ed-3/EasyBot/releases/latest", ""));
+        double versionNum = Double.parseDouble(updateJson.getString("tag_name"));
+        String downloadUrl = updateJson.getString("html_url");
+        if (versionNum > vars.Config.getDouble("version")) {
+            sender.sendMessage("§3BOT: §a有新的更新可用: " + downloadUrl);
+            sender.sendMessage("§3BOT: §a请下载最新版本以获得更多功能或避免BUG。");
+        }
     }
 }

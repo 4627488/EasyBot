@@ -1,9 +1,11 @@
-# BOT 的配置
+# 不要修改 version 选项！
+version: ${ver}
+
 # 确保 mirai 安装了 mirai-api-http
 
 # api-http 的地址
 host: localhost:8080
-# api-http 中的 authKey  用于验证身份
+# api-http 中的 authKey 用于验证身份
 authKey: this is only a demo key
 # bot 的QQ
 botID: 123456789
@@ -21,8 +23,6 @@ receive_type: message
 
 # 检查更新
 updateCheck: true
-# 自动下载更新
-autoDownload: false
 
 # 调试模式
 # 非必要无需打开
