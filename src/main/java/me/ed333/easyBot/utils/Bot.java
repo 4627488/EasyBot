@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.Set;
 
 import static me.ed333.easyBot.utils.Messages.getMsg;
@@ -290,14 +289,5 @@ public class Bot implements ValuePool {
             sender.sendMessage(bound_name.toString());
             return bound_name.contains(name);
         }
-    }
-
-    protected static String getKey(HashMap<String, Long> map, Object value) {
-        String key = "NOT FIND";
-        Set<String> keySet = map.keySet();
-        for (String o : keySet) {
-            if (map.get(o).equals(value)) key = o;
-        }
-        return key;
     }
 }

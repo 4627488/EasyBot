@@ -3,6 +3,7 @@ package me.ed333.easyBot.events.bot;
 import me.ed333.easyBot.events.bot.MessageEvent.FriendRecallEvent;
 import me.ed333.easyBot.events.bot.MessageEvent.GroupMessageReceiveEvent;
 import me.ed333.easyBot.events.bot.MessageEvent.GroupRecallEvent;
+import me.ed333.easyBot.events.bot.MessageEvent.TempMessageReceiveEvent;
 import net.sf.json.JSONObject;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -22,6 +23,8 @@ public class MessageEventHandle {
                 manager.callEvent(new GroupRecallEvent(event_json));
             case "GroupMessage":
                 manager.callEvent(new GroupMessageReceiveEvent(event_json));
+            case "TempMessage":
+                manager.callEvent(new TempMessageReceiveEvent(event_json));
         }
     }
 }

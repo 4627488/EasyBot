@@ -10,11 +10,11 @@ import org.bukkit.event.HandlerList;
  * <p>群消息事件</p>
  * <p>被继承的类, 不会被触发</p>
  */
-class GroupMessageEvent extends Event implements ValuePool {
+class MessageEvent extends Event implements ValuePool {
     private final JSONObject json;
     private static final HandlerList handlers = new HandlerList();
 
-    public GroupMessageEvent(JSONObject json) {
+    public MessageEvent(JSONObject json) {
         this.json = json;
     }
 

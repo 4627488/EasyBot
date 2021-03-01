@@ -1,6 +1,6 @@
 package me.ed333.easyBot;
 
-import me.ed333.easyBot.events.GameEvents;
+import me.ed333.easyBot.events.ListeningEvent;
 import me.ed333.easyBot.utils.HttpRequest;
 import me.ed333.easyBot.utils.Messages;
 import net.sf.json.JSONArray;
@@ -39,7 +39,7 @@ public class Main extends JavaPlugin implements ValuePool {
             vars.prefix = msgMap.get("prefix").toString();
             vars.enable_bot = vars.Config.getBoolean("enable-bot");
 
-            Bukkit.getPluginManager().registerEvents(new GameEvents(), this);
+            Bukkit.getPluginManager().registerEvents(new ListeningEvent(), this);
             if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) new PlaceHolders().register();
             if (vars.Config.getBoolean("enable-bot")) initializeBot();
             else sender.sendMessage(vars.prefix + getMsg("disable_Bot"));
