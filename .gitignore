@@ -6,6 +6,7 @@ build/
 CONSOLE/
 CONSOLE1/
 
+*.html
 *.iml
 *.ipr
 *.iws

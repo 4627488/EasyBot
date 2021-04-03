@@ -1,6 +1,6 @@
 package me.ed333.easyBot.utils;
 
-import me.ed333.easyBot.ValuePool;
+import me.ed333.easyBot.bukkit.ValuePool;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -171,6 +171,7 @@ public class JSON implements ValuePool{
         }
     }
 
+    @Deprecated
     public static class jsonBuild {
 
         /**

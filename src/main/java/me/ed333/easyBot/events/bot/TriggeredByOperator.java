@@ -15,6 +15,7 @@ public class TriggeredByOperator extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     public TriggeredByOperator(JSONObject json) {
+        super(true);
         this.json = json;
     }
 

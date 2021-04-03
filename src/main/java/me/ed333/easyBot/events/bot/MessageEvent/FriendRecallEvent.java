@@ -12,6 +12,7 @@ public class FriendRecallEvent extends Event {
     private final JSONObject json;
 
     public FriendRecallEvent(JSONObject json) {
+        super(true);
         this.json = json;
     }
 

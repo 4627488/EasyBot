@@ -1,6 +1,6 @@
 name: EasyBot
 version: ${version}
-main: me.ed333.easyBot.Main
+main: me.ed333.easyBot.bukkit.BukkitMain
 softdepend: [PlaceHolderAPI]
 commands:
   bot:

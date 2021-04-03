@@ -1,10 +1,10 @@
 package me.ed333.easyBot.events;
 
-import me.ed333.easyBot.ValuePool;
-import me.ed333.easyBot.events.bot.BotEvent.BotMuteEvent;
+import me.ed333.easyBot.bukkit.ValuePool;
 import me.ed333.easyBot.events.bot.MessageEvent.GroupMessageReceiveEvent;
 import me.ed333.easyBot.events.bot.MessageEvent.TempMessageReceiveEvent;
-import me.ed333.easyBot.utils.Bot;
+import me.ed333.easyBot.utils.MessageChain;
+import net.md_5.bungee.api.event.ChatEvent;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.bukkit.entity.Player;
@@ -27,7 +27,7 @@ public class ListeningEvent implements ValuePool, Listener {
     游戏中的事件
      */
     @EventHandler
-    private void onJoin(@NotNull PlayerJoinEvent event) {
+    public void onJoin(@NotNull PlayerJoinEvent event) {
         Player p = event.getPlayer();
         if (!enabled_Bot_Player.contains(p)) {
             if (vars.PlayerData.getBoolean(p.getUniqueId() + ".enable_Bot")) {
@@ -43,27 +43,30 @@ public class ListeningEvent implements ValuePool, Listener {
     }
 
     @EventHandler
-    private void onLeave(@NotNull PlayerQuitEvent event) {
+    public void onLeave(@NotNull PlayerQuitEvent event) {
         enabled_Bot_Player.remove(event.getPlayer());
     }
 
     @EventHandler
-    private void onChat(@NotNull AsyncPlayerChatEvent event) throws Exception {
+    public void onChat(@NotNull AsyncPlayerChatEvent event) throws Exception {
         String message = event.getMessage();
         if (bot.isConnected)
             utils.sendGroupMessage(
-                    ValuePool.vars.sessionKey,
                     groupID,
                     false,
                     0,
-                    new JSONArray().element(
-                            new JSONObject().element("type", "Plain")
-                                    .element("text", event.getPlayer().getName() + ": " + message)
-                    ));
+                    new MessageChain()
+                            .addPlain(event.getPlayer().getName())
+                            .addPlain(": ")
+                            .addPlain(message)
+            );
     }
 
+    /*
+    接收到了群消息事件
+     */
     @EventHandler
-    private void onGroupMessage(GroupMessageReceiveEvent event) {
+    public void onGroupMessage(GroupMessageReceiveEvent event) {
         if (event.getGroupId().equals(groupID)) {
             String catchType = vars.Config.getString("catch.type");
             for (Player p : enabled_Bot_Player) {
@@ -76,8 +79,11 @@ public class ListeningEvent implements ValuePool, Listener {
         }
     }
 
+    /*
+    接收到了临时消息事件
+     */
     @EventHandler
-    private void onTempMessage(TempMessageReceiveEvent event) {
+    public void onTempMessage(TempMessageReceiveEvent event) {
         Long senderId = event.getSenderId();
         if (vars.verify.containsValue(senderId)) {
             vars.Bound_data.set("QQ_Bound." + senderId, getKey(vars.verify, senderId));
@@ -86,8 +92,7 @@ public class ListeningEvent implements ValuePool, Listener {
         }
     }
 
-
-    private String getKey(HashMap<String, Long> map, Object value) {
+    public String getKey(HashMap<String, Long> map, Object value) {
         String key = "NOT FIND";
         Set<String> keySet = map.keySet();
         for (String o : keySet) {

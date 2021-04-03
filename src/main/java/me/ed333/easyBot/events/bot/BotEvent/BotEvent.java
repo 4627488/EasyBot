@@ -13,6 +13,7 @@ class BotEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     public BotEvent(JSONObject json) {
+        super(true);
         this.json = json;
     }
 

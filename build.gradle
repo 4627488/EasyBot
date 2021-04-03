@@ -8,13 +8,7 @@ repositories {
     mavenLocal()
     maven {
         url = uri('https://repo.extendedclip.com/content/repositories/placeholderapi/')
-    }
-
-    maven {
         url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/')
-    }
-
-    maven {
         url = uri('https://oss.sonatype.org/content/groups/public/')
     }
 }
@@ -22,9 +16,9 @@ repositories {
 dependencies {
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.4.1'
     implementation group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.5.1'
-
     compile group: 'net.sf.json-lib', name: 'json-lib', version:'2.4', classifier:'jdk15'
-    compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+    compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
+    compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.9'
 }
 
@@ -35,6 +29,7 @@ description = 'EasyBot'
 
 
 shadowJar {
+    from(sourceSets.main.allJava)
     manifest {
         attributes(
                 'Main-Class': 'me.ed333.easyBot.main'
@@ -44,7 +39,7 @@ shadowJar {
 
 processResources {
     from(sourceSets.main.resources.srcDirs) {
-        include 'plugin.yml','config.yml'
+        include 'plugin.yml','config.yml', 'bungee.yml'
         expand(
                 version: project.version,
                 ver: ver,

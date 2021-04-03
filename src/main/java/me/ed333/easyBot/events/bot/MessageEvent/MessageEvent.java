@@ -1,6 +1,6 @@
 package me.ed333.easyBot.events.bot.MessageEvent;
 
-import me.ed333.easyBot.ValuePool;
+import me.ed333.easyBot.bukkit.ValuePool;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.sf.json.JSONObject;
 import org.bukkit.event.Event;
@@ -11,10 +11,12 @@ import org.bukkit.event.HandlerList;
  * <p>包含了部分基础方法</p>
  */
 class MessageEvent extends Event implements ValuePool {
+
     private final JSONObject json;
     private static final HandlerList handlers = new HandlerList();
 
     public MessageEvent(JSONObject json) {
+        super(true);
         this.json = json;
     }
 

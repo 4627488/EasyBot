@@ -13,6 +13,7 @@ public class MemberLeaveEventQuit extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     public MemberLeaveEventQuit(JSONObject json) {
+        super(true);
         this.json = json;
     }
 

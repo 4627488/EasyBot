@@ -1,7 +1,8 @@
-package me.ed333.easyBot;
+package me.ed333.easyBot.bukkit;
 
 import me.ed333.easyBot.events.ListeningEvent;
 import me.ed333.easyBot.utils.HttpRequest;
+import me.ed333.easyBot.utils.MessageChain;
 import me.ed333.easyBot.utils.Messages;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -21,19 +22,20 @@ import java.util.Set;
 import static me.ed333.easyBot.utils.Messages.getMsg;
 import static me.ed333.easyBot.utils.Messages.reloadMsg;
 
-public class Main extends JavaPlugin implements ValuePool {
+public class BukkitMain extends JavaPlugin implements ValuePool {
 
-    public static Main I;
-    public Main() {I= this;}
+    public static BukkitMain INSTANCE;
+    public BukkitMain() {INSTANCE = this;}
 
     public String dataPath = getDataFolder().getPath();
 
     @Override
     public void onEnable() {
+
         try {
             checkFile();
             CheckCfg();
-            CheckUpdate();
+            if (vars.Config.getBoolean("updateCheck")) CheckUpdate();
 
             Messages.initializeMsg();
             vars.prefix = msgMap.get("prefix").toString();
@@ -107,14 +109,10 @@ public class Main extends JavaPlugin implements ValuePool {
                         if (args[0].equalsIgnoreCase("bind") && args.length == 2) {
                             if (isQQ(args[1])) {
                                 utils.sendTempMessage(
-                                        vars.sessionKey,
                                         Long.parseLong(args[1]),
                                         groupID,
                                         false, 0,
-                                        new JSONArray().element(
-                                                new JSONObject().element("type", "Plain")
-                                                        .element("text", getMsg("verify_text"))
-                                        ));
+                                        new MessageChain().addPlain(getMsg("verify_text")));
                                 vars.verify.put(p.getName(), Long.parseLong(args[1]));
                                 p.sendMessage(vars.prefix + getMsg("verify_msgSend"));
 
@@ -202,13 +200,28 @@ public class Main extends JavaPlugin implements ValuePool {
         vars.Config = YamlConfiguration.loadConfiguration(configFile);
     }
 
+    /*
+    检查更新
+     */
     private void CheckUpdate() {
-        JSONObject updateJson = JSONObject.fromObject(HttpRequest.doGet("https://api.github.com/repos/ed-3/EasyBot/releases/latest", ""));
-        double versionNum = Double.parseDouble(updateJson.getString("tag_name"));
-        String downloadUrl = updateJson.getString("html_url");
+        JSONObject updateJson = JSONObject.fromObject(HttpRequest.doGet("https://raw.githubusercontent.com/ed-3/EasyBot/master/CheckVersion/version.json", ""));
+        String version = updateJson.getString("Version");
+        double versionNum = Double.parseDouble(version.split("-")[0]);
+
+        String downloadUrl = updateJson.getString("DownLoad_Url");
+        JSONArray UpdateDescription = updateJson.getJSONArray("UpdateDescription");
+
         if (versionNum > vars.Config.getDouble("version")) {
-            sender.sendMessage("§3BOT: §a有新的更新可用: " + downloadUrl);
-            sender.sendMessage("§3BOT: §a请下载最新版本以获得更多功能或避免BUG。");
+            sender.sendMessage("§3BOT: §7有新的更新可用: §a" + version);
+            sender.sendMessage("§3BOT: §7请下载最新版本以获得更多功能或避免BUG。");
+            sender.sendMessage("§3BOT: §7请注意: §aBETA版§7会带来新的功能, 但也可能会造成新的BUG。如果有任何BUG欢迎反馈。");
+            sender.sendMessage("§3BOT: §7下载地址: §a" + downloadUrl);
+            sender.sendMessage("§3BOT: §7如果觉得插件好的话记得MCBBS评个分并把本项目给个Star~");
+            sender.sendMessage("§3BOT: §7本次更新内容如下: ");
+            for (Object str : UpdateDescription) {
+                sender.sendMessage("§7      - " + str);
+            }
+            sender.sendMessage("");
         }
     }
 }

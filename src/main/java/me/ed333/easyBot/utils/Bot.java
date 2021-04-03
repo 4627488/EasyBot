@@ -1,13 +1,12 @@
 package me.ed333.easyBot.utils;
 
 import me.ed333.easyBot.CodeErrException;
-import me.ed333.easyBot.Main;
-import me.ed333.easyBot.ValuePool;
+import me.ed333.easyBot.bukkit.BukkitMain;
+import me.ed333.easyBot.bukkit.ValuePool;
 import me.ed333.easyBot.events.bot.BotEventHandle;
 import me.ed333.easyBot.events.bot.GroupEventHandle;
 import me.ed333.easyBot.events.bot.MessageEventHandle;
 import net.md_5.bungee.api.chat.*;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -40,7 +39,7 @@ public class Bot implements ValuePool {
 
     /**
      * 关闭连接
-     * @throws Exception 请求异常
+     * @throws Exception 请求异常时抛出
      */
     public void closeSocket() throws Exception {
         client.close();
@@ -53,7 +52,7 @@ public class Bot implements ValuePool {
     /**
      * 验证身份
      * @return result
-     * @throws Exception 请求异常
+     * @throws Exception 请求异常时抛出
      */
     public String auth() throws Exception {
         sender.sendMessage("§3BOT: §a注册bot...");
@@ -64,7 +63,7 @@ public class Bot implements ValuePool {
      * 校验 Session 并将 Session 绑定到BotQQ
      * @param SessionKey session
      * @return result String
-     * @throws Exception 请求异常
+     * @throws Exception 请求异常时抛出
      */
     public String verify(String SessionKey) throws Exception {
         sender.sendMessage("§3BOT: §a绑定BOT...");
@@ -75,7 +74,7 @@ public class Bot implements ValuePool {
      * 在卸载插件时释放 bot 绑定的session
      * @param sessionKey sessionKey
      * @return result
-     * @throws Exception 请求异常
+     * @throws Exception 请求异常时抛出
      */
     protected String release_Session(String sessionKey) throws Exception {
         JSONObject request = new JSONObject().element("sessionKey", sessionKey)
@@ -96,33 +95,37 @@ public class Bot implements ValuePool {
 
         @Override
         public void onMessage(String message) {
-            Main.I.printDEBUG(message);
-            JSONObject msg_json = JSONObject.fromObject(message);
-            vars.msg_Json = msg_json;
+                BukkitMain.INSTANCE.printDEBUG(message);
+                JSONObject msg_json = JSONObject.fromObject(message);
+                vars.msg_Json = msg_json;
 
-            new BotEventHandle(msg_json);
-            new GroupEventHandle(msg_json);
-            new MessageEventHandle(msg_json);
-//            if (jsonParse.getMsgType(msg_json).equals("GroupMessage")) {
-//                if (jsonParse.getGroupID(msg_json).equals(groupID)) {
-//
-//                    String catchType = vars.Config.getString("catch.type");
-//
-//                    for (Player p : enabled_Bot_Player) {
-//                        if (catchType.equals("text") && vars.Config.getBoolean("catch.text") && !jsonParse.getText(msg_json).equals("")) {
-//                            p.sendMessage(jsonParse.getText(msg_json));
-//                        } else if (catchType.equals("multi") && (catch_at || catch_img || catch_text)) {
-//                            p.spigot().sendMessage(jsonParse.getMulti(msg_json));
-//                        }
-//                    }
-//                }
-//            } else if (jsonParse.getMsgType(msg_json).equals("TempMessage")) {
-//                if (vars.verify.containsValue(jsonParse.getSenderId(msg_json))) {
-//                    vars.Bound_data.set("QQ_Bound." + jsonParse.getSenderId(msg_json), getKey(vars.verify, jsonParse.getSenderId(msg_json)));
-//                    vars.Bound_data.set("Name_Bound." + getKey(vars.verify, jsonParse.getSenderId(msg_json)), jsonParse.getSenderId(msg_json));
-//                    vars.verify.remove(getKey(vars.verify, jsonParse.getSenderId(msg_json)));
-//                }
-//            }
+                new BotEventHandle(msg_json);
+                new GroupEventHandle(msg_json);
+                new MessageEventHandle(msg_json);
+            // Bukkit.getPluginManager().callEvent(new GroupMessageReceiveEvent(msg_json));
+/*  旧的方法
+
+            if (jsonParse.getMsgType(msg_json).equals("GroupMessage")) {
+                if (jsonParse.getGroupID(msg_json).equals(groupID)) {
+
+                    String catchType = vars.Config.getString("catch.type");
+
+                    for (Player p : enabled_Bot_Player) {
+                        if (catchType.equals("text") && vars.Config.getBoolean("catch.text") && !jsonParse.getText(msg_json).equals("")) {
+                            p.sendMessage(jsonParse.getText(msg_json));
+                        } else if (catchType.equals("multi") && (catch_at || catch_img || catch_text)) {
+                            p.spigot().sendMessage(jsonParse.getMulti(msg_json));
+                        }
+                    }
+                }
+            } else if (jsonParse.getMsgType(msg_json).equals("TempMessage")) {
+                if (vars.verify.containsValue(jsonParse.getSenderId(msg_json))) {
+                    vars.Bound_data.set("QQ_Bound." + jsonParse.getSenderId(msg_json), getKey(vars.verify, jsonParse.getSenderId(msg_json)));
+                    vars.Bound_data.set("Name_Bound." + getKey(vars.verify, jsonParse.getSenderId(msg_json)), jsonParse.getSenderId(msg_json));
+                    vars.verify.remove(getKey(vars.verify, jsonParse.getSenderId(msg_json)));
+                }
+            }
+*/
 
         }
 
@@ -141,57 +144,55 @@ public class Bot implements ValuePool {
     public static class Utils {
         /**
          * 发送好友消息
-         * @param sessionKey session
          * @param target 好友ID
          * @param quote 启用引用
          * @param code 如果引用启用， msg 的 SourceID
          * @param msgChain 要发送的消息
          * @return result
-         * @throws Exception 请求异常
+         * @throws Exception 请求异常时抛出
          */
-        public String sendFriendMessage(String sessionKey, long target, boolean quote, int code, JSONArray msgChain) throws Exception {
-            JSONObject request = new JSONObject().element("sessionKey", sessionKey)
+        public String sendFriendMessage(long target, boolean quote, int code, MessageChain msgChain) throws Exception {
+            JSONObject request = new JSONObject().element("sessionKey", vars.sessionKey)
                     .element("target", target)
-                    .element("messageChain", msgChain);
+                    .element("messageChain", msgChain.toString());
             if (quote) request.element("quote", code);
             return doPost("http://" + url + "/sendFriendMessage", request);
         }
 
         /**
          * 通过群给某人发送临时消息
-         * @param sessionKey sessionKey
          * @param qq 临时消息对象的QQ
          * @param groupID 临时消息的群号
          * @param quote 启用引用
          * @param code 如果启用引用, 引用的Message id
          * @param msgChain 消息链
          * @return result
-         * @throws Exception 请求异常
+         * @throws Exception 请求异常时抛出
          */
-        public String sendTempMessage(String sessionKey, long qq, long groupID, boolean quote, int code, JSONArray msgChain) throws Exception {
-            JSONObject request = new JSONObject().element("sessionKey", sessionKey)
+        public String sendTempMessage(long qq, long groupID, boolean quote, int code, MessageChain msgChain) throws Exception {
+            JSONObject request = new JSONObject().element("sessionKey", vars.sessionKey)
                     .element("qq", qq)
                     .element("group", groupID)
-                    .element("messageChain",msgChain);
+                    .element("messageChain",msgChain.toString());
             if (quote) request.element("quote", code);
             return doPost("http://" + url + "/sendTempMessage", request);
         }
 
         /**
          * 发送群聊消息
-         * @param sessionKey sessionKey
          * @param groupID 群号
          * @param quote 启用引用
          * @param code 如果启用引用, 引用的 Message id
          * @param msgChain 消息链
          * @return result
-         * @throws Exception 请求异常
+         * @throws Exception 请求异常时抛出
          */
-        public String sendGroupMessage(String sessionKey, long groupID, boolean quote, int code, JSONArray msgChain) throws Exception {
-            JSONObject request = new JSONObject().element("sessionKey", sessionKey)
+        public String sendGroupMessage(long groupID, boolean quote, int code, MessageChain msgChain) throws Exception {
+            JSONObject request = new JSONObject().element("sessionKey", vars.sessionKey)
                     .element("target", groupID)
-                    .element("messageChain", msgChain);
+                    .element("messageChain", msgChain.toString());
             if (quote) request.element("quote", code);
+            System.out.println(request);
             return doPost("http://" + url + "/sendGroupMessage", request);
         }
 
@@ -207,53 +208,52 @@ public class Bot implements ValuePool {
 
         /**
          * 撤回消息
-         * @param sessionKey sessionKey
          * @param SourceID 消息的ID
          * @return result
-         * @throws Exception 请求异常
+         * @throws Exception 请求异常时抛出
          */
-        public String recall(String sessionKey, int SourceID) throws Exception {
-            JSONObject request = new JSONObject().element("sessionKey", sessionKey)
+        public String recall(int SourceID) throws Exception {
+            JSONObject request = new JSONObject().element("sessionKey", vars.sessionKey)
                     .element("target", SourceID);
             return doPost("http://" + url + "/recall", request);
         }
-//
-//        /**
-//         * 禁言群员
-//         * @param memberID 群员ID
-//         * @param time 时间 单位: 秒
-//         * @return result
-//         */
-//        public String mute(String sessionKey, long groupID, long memberID, int time) throws Exception {
-//            JSONObject request = new JSONObject().element("sessionKey", sessionKey)
-//                    .element("target", groupID)
-//                    .element("memberID", memberID)
-//                    .element("time", time);
-//            return doPost("http://" + b.url + "/mute", request);
-//        }
-//
-//        /**
-//         * 解除禁言
-//         */
-//        public String unmute(String sessionKey, long groupID, long memberID) throws Exception {
-//            JSONObject request = new JSONObject().element("sessionKey", sessionKey)
-//                    .element("target", groupID)
-//                    .element("memberID", memberID);
-//            return doPost("http://" + b.url + "/unmute", request);
-//        }
-//
-//        /**
-//         * 踢出群员
-//         * @param reason 原因
-//         * @return result
-//         */
-//        public String kick(String sessionKey, long groupID, long memberID, String reason) throws Exception {
-//            JSONObject request = new JSONObject().element("sessionKey", sessionKey)
-//                    .element("target", groupID)
-//                    .element("memberID", memberID)
-//                    .element("msg", reason);
-//            return doPost("http://" + b.url + "/kick", request);
-//        }
+
+        /**
+         * 禁言群员
+         * @param memberID 群员ID
+         * @param time 时间 单位: 秒
+         * @return result
+         */
+        public String mute(long groupID, long memberID, int time) throws Exception {
+            JSONObject request = new JSONObject().element("sessionKey", vars.sessionKey)
+                    .element("target", groupID)
+                    .element("memberID", memberID)
+                    .element("time", time);
+            return doPost("http://" + url + "/mute", request);
+        }
+
+        /**
+         * 解除禁言
+         */
+        public String unmute(long groupID, long memberID) throws Exception {
+            JSONObject request = new JSONObject().element("sessionKey", vars.sessionKey)
+                    .element("target", groupID)
+                    .element("memberID", memberID);
+            return doPost("http://" + url + "/unmute", request);
+        }
+
+        /**
+         * 踢出群员
+         * @param reason 原因
+         * @return result
+         */
+        public String kick(long groupID, long memberID, String reason) throws Exception {
+            JSONObject request = new JSONObject().element("sessionKey", vars.sessionKey)
+                    .element("target", groupID)
+                    .element("memberID", memberID)
+                    .element("msg", reason);
+            return doPost("http://" + url + "/kick", request);
+        }
 
 //                                                            //
 //  depart =========================================== depart //
@@ -279,11 +279,17 @@ public class Bot implements ValuePool {
             return qq_isBound(qq) ? null : vars.Bound_data.getString("QQ_Bound." + qq);
         }
 
+        /*
+        QQ 是否被绑定了
+         */
         public boolean qq_isBound(long qq) {
             Set<String> bound_qq = vars.Bound_data.getConfigurationSection("QQ_Bound").getKeys(false);
             return !bound_qq.contains(String.valueOf(qq));
         }
 
+        /*
+        名字是否被绑定了
+         */
         public boolean name_isBound(String name) {
             Set<String> bound_name = vars.Bound_data.getConfigurationSection("Name_Bound").getKeys(false);
             sender.sendMessage(bound_name.toString());

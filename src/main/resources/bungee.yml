@@ -1,0 +1,4 @@
+name: EasyBot
+main: me.ed333.easyBot.bungee.BungeeCordMain
+version: ${version}
+description: "实现QQ群和游戏的互通！"

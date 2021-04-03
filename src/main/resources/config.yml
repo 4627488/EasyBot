@@ -13,26 +13,12 @@ botID: 123456789
 groupID: 987654321
 # 启用bot
 enable-bot: false
-# 消息抓取设置
 
-# 接收类型
-# event 为只接收 bot 的事件
-# message 为只接收 bot 收到的消息
-# all 为两者都接收
-receive_type: message
-
-# 检查更新
-updateCheck: true
-
-# 调试模式
-# 非必要无需打开
-# 否则只会增多无用的日志输出！
-DEBUG: false
-
+#消息抓取默认设置
 catch:
   # 消息抓取的类型
-  # text 为只抓取纯文本类型，不抓取其他类型
-  # multi 为抓取多种类型,
+  # text 为只抓取纯文本类消息
+  # multi 为抓取复合消息
   # ## 只有当此选项为 multi 类型时
   # img, at, emoji 等类型的抓取才有效
   type: multi
@@ -44,3 +30,35 @@ catch:
   img: true
   # 抓取at消息
   at: true
+
+# 如果你是群组服并且你希望不同的群
+# 可以发送不同服务器的消息，请在此设置
+depart:
+  enable: false
+  # 这里名称不做要求，不重复即可
+  group1:
+    # 要同步的群的id
+    id: 123456789
+    # 要同步的服务器
+    # 名称应与子服名称一致
+    server: lobby
+    # 不设置则使用默认设置
+    catch:
+      type: multi
+  group2:
+    id: 123456789
+
+# 接收类型
+# event 为只接收 bot 的事件
+# message 为只接收 bot 收到的消息
+# all 为两者都接收
+# 没啥用 也不需要更改
+receive_type: event
+
+# 检查更新
+updateCheck: true
+
+# 调试模式
+# 非必要无需打开
+# 否则只会增多无用的日志输出！
+DEBUG: false

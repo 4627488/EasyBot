@@ -10,7 +10,7 @@ import org.bukkit.plugin.PluginManager;
  * <p>如果接收到了事件就触发对应事件</p>
  */
 public class GroupEventHandle {
-    public GroupEventHandle (JSONObject event_json) {
+    public GroupEventHandle(JSONObject event_json) {
         String EventType = event_json.getString("type");
         PluginManager manager = Bukkit.getServer().getPluginManager();
         switch (EventType) {
