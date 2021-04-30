@@ -1,12 +1,9 @@
 package me.ed333.easyBot.events;
 
-import me.ed333.easyBot.bukkit.ValuePool;
+import me.ed333.easyBot.ValuePool;
 import me.ed333.easyBot.events.bot.MessageEvent.GroupMessageReceiveEvent;
 import me.ed333.easyBot.events.bot.MessageEvent.TempMessageReceiveEvent;
 import me.ed333.easyBot.utils.MessageChain;
-import net.md_5.bungee.api.event.ChatEvent;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -85,10 +82,12 @@ public class ListeningEvent implements ValuePool, Listener {
     @EventHandler
     public void onTempMessage(TempMessageReceiveEvent event) {
         Long senderId = event.getSenderId();
-        if (vars.verify.containsValue(senderId)) {
-            vars.Bound_data.set("QQ_Bound." + senderId, getKey(vars.verify, senderId));
-            vars.Bound_data.set("Name_Bound." + getKey(vars.verify, senderId), senderId);
-            vars.verify.remove(getKey(vars.verify, senderId));
+        if (event.getGroupId().equals(groupID)) {
+            if (vars.verify.containsValue(senderId)) {
+                vars.Bound_data.set("QQ_Bound." + senderId, getKey(vars.verify, senderId));
+                vars.Bound_data.set("Name_Bound." + getKey(vars.verify, senderId), senderId);
+                vars.verify.remove(getKey(vars.verify, senderId));
+            }
         }
     }
 

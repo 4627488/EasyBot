@@ -6,13 +6,16 @@ version: ${ver}
 # api-http 的地址
 host: localhost:8080
 # api-http 中的 authKey 用于验证身份
-authKey: this is only a demo key
+authKey: 123456
 # bot 的QQ
 botID: 123456789
 # bot 默认启用的群号
 groupID: 987654321
 # 启用bot
 enable-bot: false
+
+# QQ号的正则表达式， 用于绑定时检测有没有输入正确的QQ号
+regex: '[1-9][0-9]{8,10}'
 
 #消息抓取默认设置
 catch:
@@ -48,13 +51,6 @@ depart:
       type: multi
   group2:
     id: 123456789
-
-# 接收类型
-# event 为只接收 bot 的事件
-# message 为只接收 bot 收到的消息
-# all 为两者都接收
-# 没啥用 也不需要更改
-receive_type: event
 
 # 检查更新
 updateCheck: true

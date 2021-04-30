@@ -13,6 +13,7 @@ public class GroupEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     public GroupEvent(JSONObject json) {
+        super(true);
         this.json = json;
     }
 

@@ -1,4 +1,4 @@
-package me.ed333.easyBot.bukkit;
+package me.ed333.easyBot;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.ed333.easyBot.utils.Bot;
@@ -17,10 +17,11 @@ import java.util.List;
 
 public interface ValuePool {
 
-    File langFile = new File(BukkitMain.INSTANCE.dataPath, "lang.yml");
-    File configFile = new File(BukkitMain.INSTANCE.dataPath, "config.yml");
-    File dataFile = new File(BukkitMain.INSTANCE.dataPath, "playerData.yml");
-    File Bound_Data_File = new File(BukkitMain.INSTANCE.dataPath, "Bound_Data.yml");
+    File dataPath = BukkitMain.INSTANCE.getDataFolder();
+    File langFile = new File(dataPath, "lang.yml");
+    File configFile = new File(dataPath, "config.yml");
+    File dataFile = new File(dataPath, "playerData.yml");
+    File Bound_Data_File = new File(dataPath, "Bound_Data.yml");
 
     ConsoleCommandSender sender = Bukkit.getConsoleSender();
 
@@ -57,8 +58,13 @@ public interface ValuePool {
     class vars {
         // 是否启用了Bot
         public static boolean enable_bot;
+
+        // 提示消息的前缀
         public static String prefix;
+
+        // sessionKey
         public static String sessionKey;
+
         public static JSONObject msg_Json;
         public static JSONObject msg_Img;
         public static JSONObject msg_At;

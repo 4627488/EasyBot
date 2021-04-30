@@ -1,7 +1,7 @@
 name: EasyBot
 version: ${version}
-main: me.ed333.easyBot.bukkit.BukkitMain
-softdepend: [PlaceHolderAPI]
+main: me.ed333.easyBot.BukkitMain
+softdepend: [PlaceholderAPI]
 commands:
   bot:
     description: /bot reload

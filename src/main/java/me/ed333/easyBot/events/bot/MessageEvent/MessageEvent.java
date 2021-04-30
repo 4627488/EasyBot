@@ -1,6 +1,6 @@
 package me.ed333.easyBot.events.bot.MessageEvent;
 
-import me.ed333.easyBot.bukkit.ValuePool;
+import me.ed333.easyBot.ValuePool;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.sf.json.JSONObject;
 import org.bukkit.event.Event;

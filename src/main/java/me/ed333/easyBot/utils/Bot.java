@@ -1,8 +1,8 @@
 package me.ed333.easyBot.utils;
 
 import me.ed333.easyBot.CodeErrException;
-import me.ed333.easyBot.bukkit.BukkitMain;
-import me.ed333.easyBot.bukkit.ValuePool;
+import me.ed333.easyBot.BukkitMain;
+import me.ed333.easyBot.ValuePool;
 import me.ed333.easyBot.events.bot.BotEventHandle;
 import me.ed333.easyBot.events.bot.GroupEventHandle;
 import me.ed333.easyBot.events.bot.MessageEventHandle;
@@ -32,7 +32,7 @@ public class Bot implements ValuePool {
     public void connect(String sessionKey) throws URISyntaxException {
         sender.sendMessage("§3BOT: §a链接服务器中...");
 
-        URI uri = new URI("ws://" + this.url + "/" + vars.Config.getString("receive_type") + "?sessionKey=" + sessionKey);
+        URI uri = new URI("ws://" + this.url + "/all?sessionKey=" + sessionKey);
         client = new socketClient(uri);
         client.connect();
     }
@@ -102,7 +102,6 @@ public class Bot implements ValuePool {
                 new BotEventHandle(msg_json);
                 new GroupEventHandle(msg_json);
                 new MessageEventHandle(msg_json);
-            // Bukkit.getPluginManager().callEvent(new GroupMessageReceiveEvent(msg_json));
 /*  旧的方法
 
             if (jsonParse.getMsgType(msg_json).equals("GroupMessage")) {
@@ -131,6 +130,7 @@ public class Bot implements ValuePool {
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
+            bot.isConnected = false;
             sender.sendMessage("§3BOT: §a从服务器断开连接!");
         }
 
@@ -192,7 +192,6 @@ public class Bot implements ValuePool {
                     .element("target", groupID)
                     .element("messageChain", msgChain.toString());
             if (quote) request.element("quote", code);
-            System.out.println(request);
             return doPost("http://" + url + "/sendGroupMessage", request);
         }
 

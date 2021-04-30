@@ -1,4 +1,4 @@
-package me.ed333.easyBot.bukkit;
+package me.ed333.easyBot;
 
 import me.ed333.easyBot.events.ListeningEvent;
 import me.ed333.easyBot.utils.HttpRequest;
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 import static me.ed333.easyBot.utils.Messages.getMsg;
@@ -26,8 +27,6 @@ public class BukkitMain extends JavaPlugin implements ValuePool {
 
     public static BukkitMain INSTANCE;
     public BukkitMain() {INSTANCE = this;}
-
-    public String dataPath = getDataFolder().getPath();
 
     @Override
     public void onEnable() {
@@ -171,7 +170,7 @@ public class BukkitMain extends JavaPlugin implements ValuePool {
     }
 
     private boolean isQQ(@NotNull String qq) {
-        return qq.matches("[1-9][0-9]{8,10}");
+        return qq.matches(Objects.requireNonNull(vars.Config.getString("regex")));
     }
 
     public void printDEBUG(String txt) {
@@ -190,13 +189,14 @@ public class BukkitMain extends JavaPlugin implements ValuePool {
             Object configVal = vars.Config.get(key);
             if (configVal == null) {
                 vars.Config.set(key, resourceConfig.get(key));
-                vars.Config.save(configFile);
             }
         }
 
         if (vars.Config.getDouble("version") != resourceConfig.getDouble("version")) {
             vars.Config.set("version", resourceConfig.getDouble("version"));
         }
+
+        vars.Config.save(configFile);
         vars.Config = YamlConfiguration.loadConfiguration(configFile);
     }
 
@@ -210,6 +210,8 @@ public class BukkitMain extends JavaPlugin implements ValuePool {
 
         String downloadUrl = updateJson.getString("DownLoad_Url");
         JSONArray UpdateDescription = updateJson.getJSONArray("UpdateDescription");
+
+        getLogger().info(versionNum + " " + (versionNum > 0) + "");
 
         if (versionNum > vars.Config.getDouble("version")) {
             sender.sendMessage("§3BOT: §7有新的更新可用: §a" + version);
